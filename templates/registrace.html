@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Registrace</title>
+</head>
+<body>
+    <h2>Registrace</h2>
+    <form id="registraceForm" method="post" action="/registrace">
+        <label for="nick">Přezdívka:</label>
+        <input type="text" id="nick" name="nick" required pattern="[A-Za-z0-9]{2,20}">
+        <br>
+
+        <label for="je_plavec">Umí plavat:</label>
+        <select id="je_plavec" name="je_plavec" required>
+            <option value="1">Ano</option>
+            <option value="0">Ne</option>
+        </select>
+        <br>
+
+        <label for="kanoe_kamarad">S kým byste chtěli být na lodi:</label>
+        <input type="text" id="kanoe_kamarad" name="kanoe_kamarad" pattern="[A-Za-z0-9]{2,20}">
+        <br>
+
+        <input type="submit" value="Odeslat">
+        <a href="/" style="margin-left: 10px;">Storno</a>
+    </form>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#registraceForm").submit(function () {
+                var vyplneneNick = $("#nick").val();
+                var vyplneneKamarad = $("#kanoe_kamarad").val();
+
+                if (vyplneneNick.length < 2 || vyplneneNick.length > 20) {
+                    alert("Neplatný nick. Povoleny jsou pouze znaky anglické abecedy a číslice (2-20 znaků).");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "/api/check-nickname",
+                    data: { nick: vyplneneNick },
+                    success: function (result) {
+                        if (result.exists) {
+                            alert("Nick je již obsazen.");
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                });
+
+                return true;
+            });
+        });
+    </script>
+</body>
+</html>
